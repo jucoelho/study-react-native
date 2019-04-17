@@ -1,29 +1,77 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
+import React, {Component} from 'react'
+import {Platform, StyleSheet, Text, View,Alert} from 'react-native'
+import params from './src/params'
+import Field from './src/components/Field'
+import MineField from './src/components/MineField'
+import { createMinedBoard,
+cloneBoard,
+openField,
+hadExplosion,
+wonGame,
+showMines,
+invertFlag} from './src/Functions'
 
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+export default class App extends Component {
 
-type Props = {};
-export default class App extends Component<Props> {
+  constructor(props) {
+    super(props)
+    this.state = this.createState()
+  }
+
+  minesAmount =() => {
+    const cols = params.getColumnsAmount()
+    const rows = params.getRowsAmount()
+    return Math.ceil(cols * rows * params.difficulLevel)
+  }
+
+  createState =() =>{
+    const cols = params.getColumnsAmount()
+    const rows = params.getRowsAmount()
+    return {
+      board: createMinedBoard(rows,cols,this.minesAmount()),
+      won:false,
+      lost: false,
+    }
+  }
+  onOpenField =(row,column) =>{
+    const board = cloneBoard(this.state.board)
+    openField(board,row,column)
+    const lost = hadExplosion(board)
+    const won = wonGame(board)
+    if(lost){
+      showMines(board)
+      Alert.alert('Perdeu!','Facillous')
+
+    }
+    if(won){
+      Alert.alert('Ganhou!','Aeeeee')
+    }
+    this.setState({board,lost,won})
+  }
+
+  onSelectField =(row, column) =>{
+    const board = cloneBoard(this.state.board)
+    invertFlag(board,row,column)
+    const won = wonGame(board)
+    if(won){
+      Alert.alert('Parabéns','Você ganhou!')
+    }
+    this.setState({board,won})
+  }
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <Text style={styles.welcome}> Iniciando o Mines!!!</Text>
+        <Text style={styles.instructions}> Tamanhgo do grade: {params.getRowsAmount()} X {params.getColumnsAmount()}</Text>
+        <View style = {styles.board}>
+          <MineField board={this.state.board} 
+            onOpenField={this.onOpenField}
+            onSelectField ={this.onSelectField}/>
+        </View>
+
+    
+
       </View>
     );
   }
@@ -32,18 +80,11 @@ export default class App extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: 'flex-end',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  board: {
+    alignItems :'center',
+    backgroundColor: '#AAA'
+  }
+
 });
