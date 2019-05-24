@@ -10,6 +10,15 @@ export const LocationBox = styled.View`
   border: 1px solid #ddd;
   border-radius: 3px;
   flex-direction: row;
+  ${Platform.select({
+    ios: css`
+      margin-top: 20px;
+    `,
+    android: css`
+      margin-top: 10px;
+      margin-left: 10px;
+    `
+  })}
   
 `;
 export const LocationText = styled.Text`

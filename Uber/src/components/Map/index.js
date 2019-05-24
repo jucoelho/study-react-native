@@ -1,9 +1,11 @@
 import React, { Component, Fragment } from "react";
 import { View, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import Geocoder from 'react-native-geocoding';
 import { getPixelSize } from "../../Utils";
 import Search from "../Search";
 import Directions from "../Directions";
+import Details from '../Details'
 import markerImage from "../../assets/marker.png";
 import {
     Back,
@@ -13,19 +15,24 @@ import {
     LocationTimeText,
     LocationTimeTextSmall
   } from "./styles";
-
+Geocoder.init('AIzaSyCQfN-l27K-HWoG27piqAGKPfkVLTJy1Q4')
 export default class Map extends Component {
 
     state = {
         region:null,
         destination:null,
-         
+        duration : null,
+        location : null,
     }
 async componentDidMount(){
     
     navigator.geolocation.getCurrentPosition(
-        ({coords:{latitude,longitude}}) => {
+        async ({coords:{latitude,longitude}}) => {
+            const response = await Geocoder.from({latitude,longitude})
+            const address = response.results[0].formatted_address
+            const location = address.substring(0,address.indexOf(','))
             this.setState({ 
+                location,
                 region:{
                     latitude,
                     longitude,
@@ -58,7 +65,7 @@ async componentDidMount(){
          })
     }
     render(){
-        const {region,destination} = this.state;
+        const {region,destination,duration,location} = this.state;
         return(
         <View style={{flex:1}}> 
         <MapView
@@ -74,12 +81,13 @@ async componentDidMount(){
                 origin={region}
                 destination ={destination}
                 onReady= {result=>{
+                    this.setState({duration : Math.floor(result.duration)})
                     this.MapView.fitToCoordinates(result.coordinates,{
                         edgePadding:{
                             right:getPixelSize(50),
                             left:getPixelSize(50),
                             top:getPixelSize(50),
-                            bottom:getPixelSize(50),
+                            bottom:getPixelSize(350),
                         }
                     })
                 }}
@@ -88,12 +96,28 @@ async componentDidMount(){
                     coordinate={destination} 
                     anchor={{ x:0, y:0}} 
                     image={markerImage}> 
-                    
+                    <LocationBox>
+                  <LocationText>{destination.title}</LocationText>
+                </LocationBox>
+                </Marker>
+                <Marker 
+                    coordinate={region} 
+                    anchor={{ x:0, y:0}} 
+                    > 
+                    <LocationBox>
+                        <LocationTimeBox>
+                            <LocationTimeText>{duration}</LocationTimeText>
+                            <LocationTimeTextSmall>MIN</LocationTimeTextSmall>
+                        </LocationTimeBox>
+                        <LocationText>{location}</LocationText>
+                    </LocationBox>
                 </Marker>
                 </Fragment>
             )}
         </MapView>
-        <Search onLocationSelected={this.handleLocationSelected}/>
+        {destination ? <Details/> 
+        :<Search onLocationSelected={this.handleLocationSelected}/>}
+        
         </View>
         );
     }
