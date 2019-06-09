@@ -5,8 +5,10 @@ import Geocoder from 'react-native-geocoding';
 import { getPixelSize } from "../../Utils";
 import Search from "../Search";
 import Directions from "../Directions";
-import Details from '../Details'
+import Details from '../Details';
 import markerImage from "../../assets/marker.png";
+import backImage from "../../assets/back.png";
+
 import {
     Back,
     LocationBox,
@@ -64,6 +66,9 @@ async componentDidMount(){
              },
          })
     }
+    handleBack = () => {
+        this.setState({ destination: null });
+      };
     render(){
         const {region,destination,duration,location} = this.state;
         return(
@@ -115,7 +120,13 @@ async componentDidMount(){
                 </Fragment>
             )}
         </MapView>
-        {destination ? <Details/> 
+        {destination ? 
+        <Fragment> 
+            <Back onPress={this.handleBack}> 
+                <Image  source={backImage}/>
+            </Back>
+            <Details/> 
+            </Fragment>
         :<Search onLocationSelected={this.handleLocationSelected}/>}
         
         </View>
