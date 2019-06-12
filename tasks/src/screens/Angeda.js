@@ -6,6 +6,8 @@ import todayImage from '../../assets/imgs/today.jpg'
 import commonStyles from '../commonStyles'
 import Task from '../components/Task'
 import  Icon from 'react-native-vector-icons/FontAwesome'
+import ActionButton from 'react-native-action-button'
+import AddTask from './AddTask'
 export default class  Agenda extends Component {
     state = {
         tasks:[
@@ -22,8 +24,19 @@ export default class  Agenda extends Component {
         ],
         visibleTasks : [],
         showDoneTask : true,
+        showAddTask : false,
     }
 
+    addTask = task =>{
+        const tasks = [...this.state.tasks]
+        tasks.push({
+            id :17,
+            desc: task.desc,
+            estimateAt: task.data,
+            doneAt:null,
+        })
+        this.setState({tasks,showAddTask:false},this.filterTasks)
+    }
     filterTasks = () =>{
         let visibleTasks = null
         if(this.state.showDoneTask){
@@ -54,6 +67,9 @@ export default class  Agenda extends Component {
     render(){
         return (
             <View style = {styles.container}>
+                <AddTask isVisible={this.state.showAddTask}
+                    onSave={this.addTask}
+                    onCancel={() => this.setState({ showAddTask: false })} />
                 <ImageBackground source={todayImage}
                     style={styles.background}>
                     <View style = {styles.iconBar}>
@@ -74,6 +90,9 @@ export default class  Agenda extends Component {
                         keyExtractor = {item =>`${item.id}`}
                         renderItem ={({item}) =><Task {...item} onToggleTask = {this.toogleTask}/>} />
                 </View>
+                <ActionButton buttonColor={commonStyles.colors.today}
+                 onPress={() =>{this.setState({showAddTask:true})}}/>
+            
             </View>
         )
     }
