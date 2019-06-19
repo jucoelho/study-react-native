@@ -11,15 +11,9 @@ import AddTask from './AddTask'
 export default class  Agenda extends Component {
     state = {
         tasks:[
-            {id: 12 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :null},
-            {id: 13 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :new Date()},
-            {id: 14 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :null},
-            {id: 15 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :null},
-            {id: 16 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :new Date()},
-            {id: 6 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :new Date()},
-            {id: 7 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :null},
-            {id: 8 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :new Date()},
-            {id: 9 , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :null},
+            {id: Math.random() , desc:'Tarefa delete' , estimateAt:new Date() ,doneAt :null},
+            {id: Math.random() , desc:'Tarefa teste' , estimateAt:new Date() ,doneAt :new Date()},
+            
             
         ],
         visibleTasks : [],
@@ -30,7 +24,7 @@ export default class  Agenda extends Component {
     addTask = task =>{
         const tasks = [...this.state.tasks]
         tasks.push({
-            id :17,
+            id :Math.random(),
             desc: task.desc,
             estimateAt: task.data,
             doneAt:null,
@@ -54,6 +48,13 @@ export default class  Agenda extends Component {
 
     componentDidMount= () =>{
         this.filterTasks()
+    }
+    onLongPress = id =>{
+        const tasks = [...this.state.tasks].filter( task =>{
+            return task.id !== id
+        })
+        this.setState({tasks: tasks},this.filterTasks)
+        
     }
     toogleTask = id =>{
         const tasks = [...this.state.tasks]
@@ -88,7 +89,7 @@ export default class  Agenda extends Component {
                 <View style={styles.taskContainer}>
                     <FlatList data={this.state.visibleTasks} 
                         keyExtractor = {item =>`${item.id}`}
-                        renderItem ={({item}) =><Task {...item} onToggleTask = {this.toogleTask}/>} />
+                        renderItem ={({item}) =><Task {...item} onToggleTask={this.toogleTask} onLongPress = {this.onLongPress} />} />
                 </View>
                 <ActionButton buttonColor={commonStyles.colors.today}
                  onPress={() =>{this.setState({showAddTask:true})}}/>

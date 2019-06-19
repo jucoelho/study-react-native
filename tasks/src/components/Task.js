@@ -7,6 +7,10 @@ import commonStyle from '../commonStyles'
 
 export default props => {
     let check = null
+    let deleteicon = (
+    <View style={styles.deleteicon}> 
+        <Icon name='trash' size={30}  />
+    </View>)
     if (props.doneAt !== null) {
         check = (
             <View style={styles.done}>
@@ -20,7 +24,7 @@ export default props => {
     const descStyle = props.doneAt !== null ? {textDecorationLine:'line-through'} : {}
     return (
         <View style={styles.container}>
-            <TouchableWithoutFeedback onPress={() => props.onToggleTask(props.id)}>
+            <TouchableWithoutFeedback onPress={() => props.onToggleTask(props.id)} >
                 <View style={styles.checkContainer} >{check}</View>
             </TouchableWithoutFeedback>
             <View >
@@ -31,6 +35,11 @@ export default props => {
                      {moment(props.estimateAt).locale('pt-br').format('ddd, D [de] MMMM')}
                 </Text>
             </View>
+            <TouchableWithoutFeedback onPress={ () =>props.onLongPress(props.id)}>
+                <View  style={styles.deleteicon}>
+                    {deleteicon}
+                </View>
+            </TouchableWithoutFeedback>
         </View>
     )
 }
@@ -66,6 +75,7 @@ const styles = StyleSheet.create({
         fontFamily: commonStyle.fontFamily,
         color: commonStyle.colors.mainText,
         fontSize: 15,
+        width:250
     },
     date: {
         fontFamily: commonStyle.fontFamily,
@@ -84,5 +94,10 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 20,
         margin: 10,
-    }
+    },
+    deleteicon:{
+        
+        height: 25,
+        width: 25,
+    },
 })
